@@ -8,7 +8,7 @@ import {
   VisibilityOff,
   Visibility,
   EditNote,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -31,30 +31,31 @@ import {
   Tooltip,
   Snackbar,
   Alert,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import Logo from '@/components/Logo';
-import { useNavigate } from 'react-router-dom';
-import Container from '@/components/Container';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import { useAuth, currentPeserta, currentInstructor } from '@/context/auth';
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import Logo from "@/components/Logo";
+import { useNavigate } from "react-router-dom";
+import Container from "@/components/Container";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import { useAuth, currentPeserta, currentInstructor } from "@/context/auth";
 import {
   createUserAsAdmin,
   deactivateUserById,
+  deleteUserById,
   getInstructorList,
   getUserByIdAsAdmin,
   getUsersAsAdmin,
   updateUserByIdAsAdmin,
   updateUserPasswordById,
-} from '@/services/user.services';
-import { useSettings } from '@/context/settings';
-import FullPageLoading from '@/components/FullPageLoading';
-import TraineeDetail from '@/components/TraineeDetail';
-import dayjs, { Dayjs } from 'dayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import { toast } from 'react-toastify';
-import { getSubmissionList } from '@/services/submission.services';
+} from "@/services/user.services";
+import { useSettings } from "@/context/settings";
+import FullPageLoading from "@/components/FullPageLoading";
+import TraineeDetail from "@/components/TraineeDetail";
+import dayjs, { Dayjs } from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers";
+import { toast } from "react-toastify";
+import { getSubmissionList } from "@/services/submission.services";
 
 interface RowData {
   id: string;
@@ -69,30 +70,30 @@ const InstructorList = () => {
 
   const [open, setOpen] = useState(false);
   const [selectedPeserta, setSelectedPeserta] = useState({
-    id: '',
-    name: '',
-    nip: '',
+    id: "",
+    name: "",
+    nip: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
   // Detail peserta
   const [detailOpen, setDetailOpen] = useState(false);
-  const [detailId, setDetailId] = useState('');
+  const [detailId, setDetailId] = useState("");
 
   // Full page loading
   const [pageLoading, setPageLoading] = useState(false);
 
   // Register Purposes
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
 
-  const [nip, setNip] = useState('');
-  const [username, setUsername] = useState('');
+  const [nip, setNip] = useState("");
+  const [username, setUsername] = useState("");
 
-  const [code, setCode] = useState('');
-  const [password, setPassword] = useState('');
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [position, setPosition] = useState('');
+  const [position, setPosition] = useState("");
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
 
   const [rows, setRows] = useState<RowData[]>([
@@ -115,12 +116,12 @@ const InstructorList = () => {
 
   const [editPrompt, setEditPrompt] = useState(false);
   const [detailPeserta, setDetailPeserta] = useState({
-    username: '',
-    name: '',
-    email: '',
-    nip: '',
-    born: '',
-    position: '',
+    username: "",
+    name: "",
+    email: "",
+    nip: "",
+    born: "",
+    position: "",
   });
   const [newBirthDate, setNewBirthDate] = useState<Dayjs | null>(null);
 
@@ -138,11 +139,11 @@ const InstructorList = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleKembali = () => {
-    navigate('/adminstart');
+    navigate("/adminstart");
   };
 
   const handleGetLog = async () => {
@@ -153,9 +154,9 @@ const InstructorList = () => {
       currentPeserta.name = selectedPeserta.name;
       currentPeserta.nip = selectedPeserta.nip;
       await getSubmissionList(1, 5, selectedPeserta.id);
-      console.log('getting log for user: ' + selectedPeserta.id);
+      console.log("getting log for user: " + selectedPeserta.id);
 
-      navigate('/userlog');
+      navigate("/userlog");
     } catch (e) {
       console.error(e);
     } finally {
@@ -167,10 +168,12 @@ const InstructorList = () => {
     setIsLoading(true);
 
     try {
-      const res = await deactivateUserById(selectedPeserta.id);
-      console.log('deactivated user: ' + res.id);
+      let userid = selectedPeserta.id;
+      // const res = await deactivateUserById(selectedPeserta.id);
+      const res = await deleteUserById(selectedPeserta.id);
+      console.log("deactivated user: " + userid);
 
-      setRows(rows.filter((row) => row.id !== res.id));
+      setRows(rows.filter((row) => row.id !== userid));
     } catch (e) {
       console.error(e);
     } finally {
@@ -199,14 +202,14 @@ const InstructorList = () => {
 
   const validateRegister = (): boolean => {
     return (
-      nama !== '' &&
-      email !== '' &&
-      nip !== '' &&
-      username !== '' &&
-      password !== '' &&
+      nama !== "" &&
+      email !== "" &&
+      nip !== "" &&
+      username !== "" &&
+      password !== "" &&
       // code !== '' &&
       birthDate !== null &&
-      position !== ''
+      position !== ""
     );
   };
 
@@ -214,8 +217,8 @@ const InstructorList = () => {
     const isValid = validateRegister();
 
     if (!isValid) {
-      toast.error('Input registrasi tidak boleh kosong!', {
-        position: 'top-center',
+      toast.error("Input registrasi tidak boleh kosong!", {
+        position: "top-center",
       });
       return;
     }
@@ -224,11 +227,11 @@ const InstructorList = () => {
       name: nama,
       username: username,
       email: email,
-      scope: 'instructor',
+      scope: "instructor",
       password: password,
       bio: {
         officialCode: nip,
-        born: birthDate.format('YYYY-MM-DD'),
+        born: birthDate.format("YYYY-MM-DD"),
         position: position,
       },
     };
@@ -249,20 +252,20 @@ const InstructorList = () => {
 
       setPageLoading(false);
       setOpen(false);
-      setNama('');
-      setNip('');
-      setUsername('');
-      setEmail('');
-      setPassword('');
-      setCode('');
-      setPosition('');
+      setNama("");
+      setNip("");
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setCode("");
+      setPosition("");
       setBirthDate(null);
     } catch (e) {
       const errMsg = e.response.data.errorMessage;
       console.error(e);
       toast.error(
-        'Username/Email sudah terdaftar di database, mohon gunakan inputan yang berbeda',
-        { position: 'top-center' }
+        "Username/Email sudah terdaftar di database, mohon gunakan inputan yang berbeda",
+        { position: "top-center" }
       );
     } finally {
       setPageLoading(false);
@@ -286,7 +289,7 @@ const InstructorList = () => {
     setTotalData(0);
 
     const data = new FormData(e.currentTarget);
-    const query = data.get('query') as string;
+    const query = data.get("query") as string;
 
     try {
       const res = await getInstructorList(1, 5, query);
@@ -297,7 +300,7 @@ const InstructorList = () => {
         const row: RowData = {
           id: user.id,
           name: user.name,
-          nip: user.bio === null ? '' : user.bio.officialCode,
+          nip: user.bio === null ? "" : user.bio.officialCode,
         };
         console.log(row);
         resRows.push(row);
@@ -325,13 +328,13 @@ const InstructorList = () => {
 
     // Get form data based on input names
     // const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
+    const password = formData.get("password") as string;
 
-    if (password === '') {
+    if (password === "") {
       // setInputError(true);
       // setOpen(true);
-      toast.error('Input password tidak boleh kosong!', {
-        position: 'top-center',
+      toast.error("Input password tidak boleh kosong!", {
+        position: "top-center",
       });
       return;
     }
@@ -343,17 +346,17 @@ const InstructorList = () => {
 
       setIsLoading(false);
       setPasswordPrompt(false);
-      console.log('Berhasil mengubah password');
-      toast.success('Berhasil mengubah password', {
-        position: 'top-center',
+      console.log("Berhasil mengubah password");
+      toast.success("Berhasil mengubah password", {
+        position: "top-center",
       });
     } catch (e) {
       const errMsg = e.response.data.errorMessage;
       console.error(e);
       // setOpen(true);
       // setErrorMsg(errMsg);
-      toast.error('Gagal mengubah password, ada masalah dari server', {
-        position: 'top-center',
+      toast.error("Gagal mengubah password, ada masalah dari server", {
+        position: "top-center",
       });
     }
   };
@@ -362,11 +365,11 @@ const InstructorList = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const newName = formData.get('new-name') as string;
-    const newUsername = formData.get('new-username') as string;
-    const newEmail = formData.get('new-email') as string;
-    const newNIP = formData.get('new-nip') as string;
-    const newPosition = formData.get('new-position') as string;
+    const newName = formData.get("new-name") as string;
+    const newUsername = formData.get("new-username") as string;
+    const newEmail = formData.get("new-email") as string;
+    const newNIP = formData.get("new-nip") as string;
+    const newPosition = formData.get("new-position") as string;
 
     const payload = {
       name: newName,
@@ -374,7 +377,7 @@ const InstructorList = () => {
       email: newEmail,
       bio: {
         officialCode: newNIP,
-        born: newBirthDate.format('YYYY-MM-DD'),
+        born: newBirthDate.format("YYYY-MM-DD"),
         position: newPosition,
       },
     };
@@ -383,10 +386,10 @@ const InstructorList = () => {
       const res = await updateUserByIdAsAdmin(selectedPeserta.id, payload);
 
       setEditPrompt(false);
-      toast.success('Data peserta berhasil diubah', { position: 'top-center' });
+      toast.success("Data peserta berhasil diubah", { position: "top-center" });
     } catch (e) {
       const errMsg = e.response.data.errorMessage;
-      toast.error(errMsg, { position: 'top-center' });
+      toast.error(errMsg, { position: "top-center" });
     }
   };
 
@@ -402,7 +405,7 @@ const InstructorList = () => {
           const row: RowData = {
             id: user.id,
             name: user.name,
-            nip: user.bio === null ? '' : user.bio.officialCode,
+            nip: user.bio === null ? "" : user.bio.officialCode,
           };
           console.log(row);
 
@@ -501,7 +504,7 @@ const InstructorList = () => {
                   <TableRow
                     key={row.id}
                     sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
+                      "&:last-child td, &:last-child th": { border: 0 },
                     }}
                   >
                     <TableCell>{row.name}</TableCell>
@@ -558,13 +561,13 @@ const InstructorList = () => {
                                 email: peserta.email,
                                 nip:
                                   peserta.bio === null
-                                    ? ''
+                                    ? ""
                                     : peserta.bio.officialCode,
                                 born:
-                                  peserta.bio === null ? '' : peserta.bio.born,
+                                  peserta.bio === null ? "" : peserta.bio.born,
                                 position:
                                   peserta.bio === null
-                                    ? ''
+                                    ? ""
                                     : peserta.bio.position,
                               });
                               setNewBirthDate(
@@ -710,7 +713,7 @@ const InstructorList = () => {
               margin="normal"
               id="password"
               label="Password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               variant="standard"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -803,7 +806,7 @@ const InstructorList = () => {
               // required
               variant="standard"
               fullWidth
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               // error={inputError}
               // onFocus={() => setInputError(false)}
               InputProps={{

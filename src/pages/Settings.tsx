@@ -533,52 +533,58 @@ const Settings = () => {
           />
         </div>
 
-        <div className="flex items-center p-2">
-          <NotificationsActive className="my-[0.5px] mr-2 text-gray-400" />
-          <FormControlLabel
-            className="text-[#00000099] min-w-[180px]"
-            control={
-              <Checkbox
-                // defaultChecked
-                checked={settings.useSpeedBuzzer}
-                // value={settings.useSpeedBuzzer}
-                onChange={() =>
+        {trainType === 'krl' ? (
+          <>
+            <div className="flex items-center p-2">
+              <NotificationsActive className="my-[0.5px] mr-2 text-gray-400" />
+              <FormControlLabel
+                className="text-[#00000099] min-w-[180px]"
+                control={
+                  <Checkbox
+                    // defaultChecked
+                    checked={settings.useSpeedBuzzer}
+                    // value={settings.useSpeedBuzzer}
+                    onChange={() =>
+                      setSettings({
+                        ...settings,
+                        useSpeedBuzzer: !settings.useSpeedBuzzer,
+                      })
+                    }
+                  />
+                }
+                label="Buzzer Kecepatan"
+              />
+              <Input
+                className="max-w-[50px]"
+                // defaultValue={70}
+                value={settings.speedLimit}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => {
+                  let limit = Number(e.target.value);
+                  if (limit > 100) limit = 100;
+                  if (limit < 0) limit = 0;
+                  // if (!settings.useSpeedBuzzer) limit = 70;
+
                   setSettings({
                     ...settings,
-                    useSpeedBuzzer: !settings.useSpeedBuzzer,
-                  })
-                }
+                    speedLimit: limit,
+                  });
+                }}
+                inputProps={{
+                  step: 5,
+                  min: 0,
+                  max: 100,
+                  type: 'number',
+                }}
+                disabled={!settings.useSpeedBuzzer}
+                // readOnly={!settings.useSpeedBuzzer}
               />
-            }
-            label="Buzzer Kecepatan"
-          />
-          <Input
-            className="max-w-[50px]"
-            // defaultValue={70}
-            value={settings.speedLimit}
-            onFocus={(e) => e.target.select()}
-            onChange={(e) => {
-              let limit = Number(e.target.value);
-              if (limit > 100) limit = 100;
-              if (limit < 0) limit = 0;
-              // if (!settings.useSpeedBuzzer) limit = 70;
-
-              setSettings({
-                ...settings,
-                speedLimit: limit,
-              });
-            }}
-            inputProps={{
-              step: 5,
-              min: 0,
-              max: 100,
-              type: 'number',
-            }}
-            disabled={!settings.useSpeedBuzzer}
-            // readOnly={!settings.useSpeedBuzzer}
-          />
-          <span className="text-[#00000099]">km/jam</span>
-        </div>
+              <span className="text-[#00000099]">km/jam</span>
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
 
         <div className="flex justify-between w-full mt-8">
           {

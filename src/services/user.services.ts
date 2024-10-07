@@ -1,8 +1,8 @@
-import services from '.';
+import services from ".";
 
 export const createUser = async (payload: any) => {
   // try {
-  const res = await services.post('/instructor/user', payload);
+  const res = await services.post("/instructor/user", payload);
 
   return res.data;
   // } catch (e) {
@@ -15,11 +15,11 @@ export const createUser = async (payload: any) => {
 export const getUsers = async (
   page: number = 1,
   size: number = 5,
-  nip_query: string = ''
+  nip_query: string = ""
 ) => {
   const res = await services.get(
     `/instructor/user?page=${page}&size=${size}&isActive=true${
-      nip_query === '' ? '' : `&username:likeLower=${nip_query}`
+      nip_query === "" ? "" : `&username:likeLower=${nip_query}`
     }`
   );
 
@@ -42,7 +42,7 @@ export const updateUserById = async (id: string, payload: any) => {
 /// FOR ADMIN
 
 export const createUserAsAdmin = async (payload: any) => {
-  const res = await services.post('/admin/user', payload);
+  const res = await services.post("/admin/user", payload);
 
   return res.data;
 };
@@ -51,11 +51,11 @@ export const createUserAsAdmin = async (payload: any) => {
 export const getUsersAsAdmin = async (
   page: number = 1,
   size: number = 5,
-  nip_query: string = ''
+  nip_query: string = ""
 ) => {
   const res = await services.get(
     `/admin/user/by-scope/trainee?page=${page}&size=${size}&isActive=true${
-      nip_query === '' ? '' : `&bio.officialCode=${nip_query}`
+      nip_query === "" ? "" : `&bio.officialCode=${nip_query}`
     }`
   );
 
@@ -66,11 +66,11 @@ export const getUsersAsAdmin = async (
 export const getInstructorList = async (
   page: number = 1,
   size: number = 5,
-  nip_query: string = ''
+  nip_query: string = ""
 ) => {
   const res = await services.get(
     `/admin/user/by-scope/instructor?page=${page}&size=${size}&isActive=true${
-      nip_query === '' ? '' : `&bio.officialCode=${nip_query}`
+      nip_query === "" ? "" : `&bio.officialCode=${nip_query}`
     }`
   );
 
@@ -93,6 +93,12 @@ export const deactivateUserById = async (id: string) => {
   const res = await services.put(`/admin/user/${id}/change-status`, {
     isActive: false,
   });
+
+  return res.data;
+};
+
+export const deleteUserById = async (id: string) => {
+  const res = await services.delete(`/admin/user/${id}`);
 
   return res.data;
 };

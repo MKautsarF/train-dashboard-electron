@@ -53,6 +53,7 @@
     "@mui/x-date-pickers": "^6.16.1",
     "@pdfme/common": "^4.0.1",
     "@pdfme/generator": "^4.0.1",
+    "@react-pdf/renderer": "^3.4.4",
     "@types/node": "^20.10.5",
     "axios": "^1.5.1",
     "dayjs": "^1.11.10",

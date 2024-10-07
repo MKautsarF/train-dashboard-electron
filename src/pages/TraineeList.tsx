@@ -5,7 +5,7 @@ import {
   Info,
   NavigateBefore,
   PersonAdd,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -26,28 +26,29 @@ import {
   CircularProgress,
   Tooltip,
   IconButton,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import Logo from '@/components/Logo';
-import { useNavigate } from 'react-router-dom';
-import Container from '@/components/Container';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import { useAuth, currentPeserta, currentInstructor } from '@/context/auth';
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import Logo from "@/components/Logo";
+import { useNavigate } from "react-router-dom";
+import Container from "@/components/Container";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import { useAuth, currentPeserta, currentInstructor } from "@/context/auth";
 import {
   createUserAsAdmin,
   deactivateUserById,
+  deleteUserById,
   getUserByIdAsAdmin,
   getUsersAsAdmin,
   updateUserByIdAsAdmin,
-} from '@/services/user.services';
-import { useSettings } from '@/context/settings';
-import FullPageLoading from '@/components/FullPageLoading';
-import TraineeDetail from '@/components/TraineeDetail';
-import dayjs, { Dayjs } from 'dayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import { toast } from 'react-toastify';
-import { getSubmissionList } from '@/services/submission.services';
+} from "@/services/user.services";
+import { useSettings } from "@/context/settings";
+import FullPageLoading from "@/components/FullPageLoading";
+import TraineeDetail from "@/components/TraineeDetail";
+import dayjs, { Dayjs } from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers";
+import { toast } from "react-toastify";
+import { getSubmissionList } from "@/services/submission.services";
 
 interface RowData {
   id: string;
@@ -62,25 +63,25 @@ const TraineeList = () => {
 
   const [open, setOpen] = useState(false);
   const [selectedPeserta, setSelectedPeserta] = useState({
-    id: '',
-    name: '',
-    nip: '',
+    id: "",
+    name: "",
+    nip: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
   // Detail peserta
   const [detailOpen, setDetailOpen] = useState(false);
-  const [detailId, setDetailId] = useState('');
+  const [detailId, setDetailId] = useState("");
 
   // Full page loading
   const [pageLoading, setPageLoading] = useState(false);
 
   // Register Purposes
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
-  const [nip, setNip] = useState('');
-  const [code, setCode] = useState('');
-  const [position, setPosition] = useState('');
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [nip, setNip] = useState("");
+  const [code, setCode] = useState("");
+  const [position, setPosition] = useState("");
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
 
   const [rows, setRows] = useState<RowData[]>([
@@ -98,12 +99,12 @@ const TraineeList = () => {
 
   const [editPrompt, setEditPrompt] = useState(false);
   const [detailPeserta, setDetailPeserta] = useState({
-    username: '',
-    name: '',
-    email: '',
-    nip: '',
-    born: '',
-    position: '',
+    username: "",
+    name: "",
+    email: "",
+    nip: "",
+    born: "",
+    position: "",
   });
   const [newBirthDate, setNewBirthDate] = useState<Dayjs | null>(null);
 
@@ -121,11 +122,11 @@ const TraineeList = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleKembali = () => {
-    navigate('/adminstart');
+    navigate("/adminstart");
   };
 
   const handleGetLog = async () => {
@@ -136,9 +137,9 @@ const TraineeList = () => {
       currentPeserta.name = selectedPeserta.name;
       currentPeserta.nip = selectedPeserta.nip;
       await getSubmissionList(1, 5, selectedPeserta.id);
-      console.log('getting log for user: ' + selectedPeserta.id);
+      console.log("getting log for user: " + selectedPeserta.id);
 
-      navigate('/userlog');
+      navigate("/userlog");
     } catch (e) {
       console.error(e);
     } finally {
@@ -150,10 +151,12 @@ const TraineeList = () => {
     setIsLoading(true);
 
     try {
-      const res = await deactivateUserById(selectedPeserta.id);
-      console.log('deactivated user: ' + res.id);
+      let userid = selectedPeserta.id;
+      // const res = await deactivateUserById(selectedPeserta.id);
+      const res = await deleteUserById(selectedPeserta.id);
+      console.log("deactivated user: " + userid);
 
-      setRows(rows.filter((row) => row.id !== res.id));
+      setRows(rows.filter((row) => row.id !== userid));
     } catch (e) {
       console.error(e);
     } finally {
@@ -207,12 +210,12 @@ const TraineeList = () => {
 
   const validateRegister = (): boolean => {
     return (
-      nama !== '' &&
-      nip !== '' &&
-      email !== '' &&
+      nama !== "" &&
+      nip !== "" &&
+      email !== "" &&
       // code !== '' &&
       birthDate !== null &&
-      position !== ''
+      position !== ""
     );
   };
 
@@ -220,8 +223,8 @@ const TraineeList = () => {
     const isValid = validateRegister();
 
     if (!isValid) {
-      toast.error('Input registrasi tidak boleh kosong!', {
-        position: 'top-center',
+      toast.error("Input registrasi tidak boleh kosong!", {
+        position: "top-center",
       });
       return;
     }
@@ -231,11 +234,11 @@ const TraineeList = () => {
       username: nip,
 
       email: email,
-      scope: 'trainee',
-      password: 'P@ssword!23',
+      scope: "trainee",
+      password: "P@ssword!23",
       bio: {
         officialCode: nip,
-        born: birthDate.format('YYYY-MM-DD'),
+        born: birthDate.format("YYYY-MM-DD"),
         position: position,
       },
     };
@@ -256,19 +259,19 @@ const TraineeList = () => {
 
       setPageLoading(false);
       setOpen(false);
-      setNama('');
-      setNip('');
-      setEmail('');
-      setCode('');
-      setPosition('');
+      setNama("");
+      setNip("");
+      setEmail("");
+      setCode("");
+      setPosition("");
       setBirthDate(null);
     } catch (e) {
       const errMsg = e.response.data.errorMessage;
       console.error(e);
       toast.error(
-        'Email peserta sudah terdaftar di database, mohon gunakan email yang berbeda',
+        "Email peserta sudah terdaftar di database, mohon gunakan email yang berbeda",
         {
-          position: 'top-center',
+          position: "top-center",
         }
       );
     } finally {
@@ -291,7 +294,7 @@ const TraineeList = () => {
     setTotalData(0);
 
     const data = new FormData(e.currentTarget);
-    const query = data.get('query') as string;
+    const query = data.get("query") as string;
 
     try {
       const res = await getUsersAsAdmin(1, 5, query);
@@ -315,10 +318,10 @@ const TraineeList = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const newName = formData.get('new-name') as string;
-    const newEmail = formData.get('new-email') as string;
-    const newNIP = formData.get('new-nip') as string;
-    const newPosition = formData.get('new-position') as string;
+    const newName = formData.get("new-name") as string;
+    const newEmail = formData.get("new-email") as string;
+    const newNIP = formData.get("new-nip") as string;
+    const newPosition = formData.get("new-position") as string;
 
     const payload = {
       name: newName,
@@ -326,7 +329,7 @@ const TraineeList = () => {
       email: newEmail,
       bio: {
         officialCode: newNIP,
-        born: newBirthDate.format('YYYY-MM-DD'),
+        born: newBirthDate.format("YYYY-MM-DD"),
         position: newPosition,
       },
     };
@@ -335,10 +338,10 @@ const TraineeList = () => {
       const res = await updateUserByIdAsAdmin(selectedPeserta.id, payload);
 
       setEditPrompt(false);
-      toast.success('Data peserta berhasil diubah', { position: 'top-center' });
+      toast.success("Data peserta berhasil diubah", { position: "top-center" });
     } catch (e) {
       const errMsg = e.response.data.errorMessage;
-      toast.error(errMsg, { position: 'top-center' });
+      toast.error(errMsg, { position: "top-center" });
     }
   };
 
@@ -436,7 +439,7 @@ const TraineeList = () => {
                   <TableRow
                     key={row.id}
                     sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
+                      "&:last-child td, &:last-child th": { border: 0 },
                     }}
                   >
                     <TableCell>{row.name}</TableCell>
@@ -493,13 +496,13 @@ const TraineeList = () => {
                                 email: peserta.email,
                                 nip:
                                   peserta.bio === null
-                                    ? ''
+                                    ? ""
                                     : peserta.bio.officialCode,
                                 born:
-                                  peserta.bio === null ? '' : peserta.bio.born,
+                                  peserta.bio === null ? "" : peserta.bio.born,
                                 position:
                                   peserta.bio === null
-                                    ? ''
+                                    ? ""
                                     : peserta.bio.position,
                               });
                               setNewBirthDate(
