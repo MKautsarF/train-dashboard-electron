@@ -35,10 +35,6 @@ const routerData = [
     path: '/',
     element: <Login />,
   },
-  // {
-  //   path: "/",
-  //   element: <TEST />,
-  // },
   {
     path: '/option',
     element: <Option />,

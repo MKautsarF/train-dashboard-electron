@@ -97,6 +97,10 @@ const Login = () => {
   return (
     <>
       <Container h={325} w={435}>
+        <div className="w-1/3 absolute -translate-y-full py-4">
+          <Logo />
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 justify-center p-8"

@@ -691,7 +691,7 @@ const InstructorList = () => {
             margin="normal"
             id="nip"
             label="NIP"
-            type="text"
+            type="number"
             fullWidth
             variant="standard"
             value={nip}
@@ -870,6 +870,7 @@ const InstructorList = () => {
               id="new-nip"
               label="NIP"
               name="new-nip"
+              type="number"
               variant="standard"
               fullWidth
               defaultValue={selectedPeserta.nip}

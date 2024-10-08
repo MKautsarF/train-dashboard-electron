@@ -609,7 +609,7 @@ const TraineeList = () => {
             margin="normal"
             id="nip"
             label="NIP"
-            type="text"
+            type="number"
             fullWidth
             variant="standard"
             value={nip}
@@ -728,6 +728,7 @@ const TraineeList = () => {
               className="my-4"
               id="new-nip"
               label="NIP"
+              type="number"
               name="new-nip"
               variant="standard"
               fullWidth

@@ -1,5 +1,5 @@
 import FullPageLoading from '@/components/FullPageLoading';
-import { getUsers } from '@/services/user.services';
+import { getUserById, getUsers } from '@/services/user.services';
 import {
   Box,
   Button,
@@ -20,8 +20,8 @@ import {
   CircularProgress,
 } from '@mui/material';
 import Container from '@/components/Container';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { currentPeserta } from '@/context/auth';
 import {
   getSubmissionById,
@@ -48,8 +48,31 @@ interface RowData {
   module: string;
 }
 
+interface UserLog {
+  id: string;
+  name: string;
+  nip: string;
+  username: string;
+  bio: {
+      born: string;
+      officialCode: string;
+      position: string;
+  };
+  completion?: number;
+}
+
+function useQuery() {
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 const UserLog = () => {
+  const query = useQuery();
   const navigate = useNavigate();
+  const userId = query.get("id");
+
+  const [userLog, setUserLog] = useState<UserLog | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,8 +95,12 @@ const UserLog = () => {
       try {
         setIsLoading(true);
 
-        const res = await getSubmissionList(page, 5, currentPeserta.id);
-        const resRows = res.results.map((data: any) => ({
+        const res = await getUserById(userId);
+        const res2 = await getSubmissionList(page, 5, userId);
+        
+        setUserLog(res);
+
+        const resRows = res2.results.map((data: any) => ({
           id: data.id,
           date: data.createdAt,
           train: data.train,
@@ -103,14 +130,16 @@ const UserLog = () => {
       <div className="flex flex-col p-6 h-full">
         {/* Detail peserta */}
         <Box component="form" className="flex gap-4 w-full">
-          <div className="title">
-            <h3>Log Peserta</h3>
+          <div className="title w-full">
+            <h1 className="w-full text-center mb-2">
+              Log Peserta
+            </h1>
             <br />
             <p>
-              <b>Nama:</b> {currentPeserta.name}
+              <b>Nama:</b> {userLog?.name}
             </p>
             <p>
-              <b>NIP:</b> {currentPeserta.nip}
+              <b>NIP:</b> {userLog?.username}
             </p>
             <br />
           </div>
