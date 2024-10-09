@@ -473,6 +473,8 @@ const TraineeList = () => {
                                 nip: row.nip,
                               });
                               handleGetUserDetail();
+                              // navigate(`/userlog?id=${row.id}&type=admin`);
+                              // console.log("ini id nya: ", row.id);
                             }}
                           >
                             <Info />

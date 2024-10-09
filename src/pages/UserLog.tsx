@@ -1,5 +1,9 @@
-import FullPageLoading from '@/components/FullPageLoading';
-import { getUserById, getUsers } from '@/services/user.services';
+import FullPageLoading from "@/components/FullPageLoading";
+import {
+  getUserById,
+  getUserByIdAsAdmin,
+  getUsers,
+} from "@/services/user.services";
 import {
   Box,
   Button,
@@ -18,25 +22,27 @@ import {
   TableRow,
   TablePagination,
   CircularProgress,
-} from '@mui/material';
-import Container from '@/components/Container';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { currentPeserta } from '@/context/auth';
+} from "@mui/material";
+import Container from "@/components/Container";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { currentPeserta } from "@/context/auth";
 import {
+  deleteAllSubmissionById,
+  deleteSubmissionById,
   getSubmissionById,
   getSubmissionList,
   getSubmissionLogByFileIndex,
-} from '@/services/submission.services';
-import dayjs from 'dayjs';
-import { sendTextToClients } from '@/socket';
-import FileSaver = require('file-saver');
-import { shell } from 'electron';
-import fs from 'fs';
-import { config } from '@/config';
-import { processFile, processFileExcel } from '@/services/file.services';
-import { toast } from 'react-toastify';
-import Logo from '@/components/Logo';
+} from "@/services/submission.services";
+import dayjs from "dayjs";
+import { sendTextToClients } from "@/socket";
+import FileSaver = require("file-saver");
+import { shell } from "electron";
+import fs from "fs";
+import { config } from "@/config";
+import { processFile, processFileExcel } from "@/services/file.services";
+import { toast } from "react-toastify";
+import Logo from "@/components/Logo";
 
 interface RowData {
   id: any;
@@ -54,9 +60,9 @@ interface UserLog {
   nip: string;
   username: string;
   bio: {
-      born: string;
-      officialCode: string;
-      position: string;
+    born: string;
+    officialCode: string;
+    position: string;
   };
   completion?: number;
 }
@@ -71,6 +77,8 @@ const UserLog = () => {
   const query = useQuery();
   const navigate = useNavigate();
   const userId = query.get("id");
+  const userType = query.get("type") as "admin" | "instructor";
+  // console.log("ini userTypenya: ", userType);
 
   const [userLog, setUserLog] = useState<UserLog | null>(null);
 
@@ -81,23 +89,29 @@ const UserLog = () => {
   const [rows, setRows] = useState<RowData[]>([]);
   const [totalData, setTotalData] = useState(0);
   const [page, setPage] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0); // State to trigger refresh
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage + 1);
   };
 
   const handleBack = () => {
-    navigate('/search');
+    // navigate('/search');
+    navigate(-1);
   };
 
   useEffect(() => {
     async function getRows(page: number) {
       try {
         setIsLoading(true);
-
-        const res = await getUserById(userId);
+        let res;
+        if (userType == "admin") {
+          res = await getUserByIdAsAdmin(userId);
+        } else {
+          res = await getUserById(userId);
+        }
         const res2 = await getSubmissionList(page, 5, userId);
-        
+
         setUserLog(res);
 
         const resRows = res2.results.map((data: any) => ({
@@ -107,7 +121,7 @@ const UserLog = () => {
           start: data.setting.route.start.name,
           finish: data.setting.route.finish.name,
           // status: data.status,
-          module: !data.setting.module ? 'Testing' : data.setting.module,
+          module: !data.setting.module ? "Testing" : data.setting.module,
         }));
 
         setRows(resRows);
@@ -120,7 +134,7 @@ const UserLog = () => {
     }
 
     getRows(page);
-  }, [page]);
+  }, [page, refreshKey]);
 
   return (
     <Container w={1000} h={700}>
@@ -131,9 +145,7 @@ const UserLog = () => {
         {/* Detail peserta */}
         <Box component="form" className="flex gap-4 w-full">
           <div className="title w-full">
-            <h1 className="w-full text-center mb-2">
-              Log Peserta
-            </h1>
+            <h1 className="w-full text-center mb-2">Log Peserta</h1>
             <br />
             <p>
               <b>Nama:</b> {userLog?.name}
@@ -153,8 +165,9 @@ const UserLog = () => {
               <col width="10%" />
               <col width="20%" />
               <col width="20%" />
-              <col width="15%" />
-              <col width="15%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
             </colgroup>
             <TableHead>
               <TableRow>
@@ -164,6 +177,7 @@ const UserLog = () => {
                 <TableCell>Finish</TableCell>
                 <TableCell>Modul</TableCell>
                 <TableCell>Result</TableCell>
+                <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
             {isLoading ? (
@@ -176,11 +190,11 @@ const UserLog = () => {
                   <TableRow
                     key={row.id}
                     sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
+                      "&:last-child td, &:last-child th": { border: 0 },
                     }}
                   >
                     <TableCell>
-                      {dayjs(row.date).format('DD MMM YYYY, HH:mm')}
+                      {dayjs(row.date).format("DD MMM YYYY, HH:mm")}
                     </TableCell>
                     <TableCell>{row.train}</TableCell>
                     <TableCell>{row.start}</TableCell>
@@ -223,7 +237,7 @@ const UserLog = () => {
 
                             let jsonId: number;
                             for (const log of logs) {
-                              if (log.tag === 'json') {
+                              if (log.tag === "json") {
                                 jsonId = log.id;
                               }
                             }
@@ -231,8 +245,8 @@ const UserLog = () => {
                             console.log(jsonId);
 
                             if (!jsonId) {
-                              toast.error('File tidak ditemukan di server', {
-                                position: 'top-center',
+                              toast.error("File tidak ditemukan di server", {
+                                position: "top-center",
                               });
                               return;
                             }
@@ -250,7 +264,7 @@ const UserLog = () => {
 
                               const jsonPdf = await processFile(
                                 `C:/Train Simulator/Data/penilaian/PDF/Preview`,
-                                'on'
+                                "on"
                               );
 
                               shell.openPath(
@@ -259,8 +273,8 @@ const UserLog = () => {
                             } catch (err) {
                               const errMsg = err.response.data.errorMessage;
                               console.error(errMsg);
-                              toast.error('Gagal membuka pdf', {
-                                position: 'top-center',
+                              toast.error("Gagal membuka pdf", {
+                                position: "top-center",
                               });
                             }
                           }}
@@ -276,7 +290,7 @@ const UserLog = () => {
 
                             let jsonId: number;
                             for (const log of logs) {
-                              if (log.tag === 'json') {
+                              if (log.tag === "json") {
                                 jsonId = log.id;
                               }
                             }
@@ -284,8 +298,8 @@ const UserLog = () => {
                             console.log(jsonId);
 
                             if (!jsonId) {
-                              toast.error('File tidak ditemukan di server', {
-                                position: 'top-center',
+                              toast.error("File tidak ditemukan di server", {
+                                position: "top-center",
                               });
                               return;
                             }
@@ -303,7 +317,7 @@ const UserLog = () => {
 
                               const jsonExcel = await processFileExcel(
                                 `C:/Train Simulator/Data/penilaian/Excel/Preview`,
-                                'on'
+                                "on"
                               );
 
                               shell.openPath(
@@ -312,8 +326,8 @@ const UserLog = () => {
                             } catch (err) {
                               const errMsg = err.response.data.errorMessage;
                               console.error(errMsg);
-                              toast.error('Gagal membuka excel', {
-                                position: 'top-center',
+                              toast.error("Gagal membuka excel", {
+                                position: "top-center",
                               });
                             }
                           }}
@@ -348,6 +362,38 @@ const UserLog = () => {
                         </Button> */}
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outlined"
+                          sx={{
+                            color: "red",
+                            borderColor: "red",
+                            "&:hover": {
+                              borderColor: "red",
+                              color: "red",
+                            },
+                          }}
+                          onClick={async () => {
+                            const res2 = await getSubmissionById(row.id);
+                            const res = await deleteSubmissionById(row.id);
+
+                            setRows(rows.filter((row) => row.id !== res2.id));
+                            try {
+                            } catch (err) {
+                              const errMsg = err.response.data.errorMessage;
+                              console.error(errMsg);
+                              toast.error("Gagal menghapus submission", {
+                                position: "top-center",
+                              });
+                            }
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
                     {/* <TableCell align="right">
                   </TableCell> */}
                   </TableRow>
@@ -373,7 +419,7 @@ const UserLog = () => {
         />
 
         {/* Navigation */}
-        <div className="flex gap-4">
+        <div className="flex justify-between gap-4">
           <Button
             type="button"
             variant="outlined"
@@ -382,6 +428,26 @@ const UserLog = () => {
             onClick={() => handleBack()}
           >
             Kembali
+          </Button>
+
+          <Button
+            type="button"
+            variant="outlined"
+            style={{ color: "red", borderColor: "red" }}
+            onClick={async () => {
+              try {
+                const res = await deleteAllSubmissionById(userLog?.id);
+                setRefreshKey((oldKey) => oldKey + 1);
+              } catch (err) {
+                const errMsg = err.response.data.errorMessage;
+                console.error(errMsg);
+                toast.error("Gagal menghapus semua log submission", {
+                  position: "top-center",
+                });
+              }
+            }}
+          >
+            Delete all submission log
           </Button>
         </div>
       </div>
