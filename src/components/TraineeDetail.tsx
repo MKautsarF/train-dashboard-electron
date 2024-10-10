@@ -110,14 +110,6 @@ const TraineeDetail: React.FC<TraineeDetailProps> = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions className="flex justify-end">
-        {/* {currentInstructor.isAdmin ? (
-          <Button color="error" onClick={handleHapus}>
-            Hapus
-          </Button>
-        ) : (
-          <Button onClick={handleLog}>Log</Button>
-        )} */}
-
         {currentInstructor.isAdmin ? null : (
           <>
             <Button onClick={handleEdit}>Edit</Button>
