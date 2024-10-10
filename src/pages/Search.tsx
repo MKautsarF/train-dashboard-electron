@@ -27,7 +27,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useAuth, currentPeserta, currentInstructor } from '@/context/auth';
 import {
   createUser,
-  // deleteUserById,
   getUsers,
   getUserById,
   updateUserById,
@@ -97,8 +96,17 @@ const Search = () => {
   const [newBirthDate, setNewBirthDate] = useState<Dayjs | null>(null);
 
   currentInstructor.isAdmin = false;
-  // console.log(currentInstructor.isAdmin);
   currentInstructor.isInstructor = false;
+
+  const [logoutOpen, setLogoutOpen] = useState(false);
+
+  const handleLogoutOpen = () => setLogoutOpen(true);
+  const handleLogoutClose = () => setLogoutOpen(false);
+
+  const handleConfirmLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -108,54 +116,17 @@ const Search = () => {
     setOpen(true);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  // const handleHapus = async () => {
-  //   try {
-  //     console.log("handleHapus called");
-
-  //     const res = await deleteUserById(selectedPeserta.id);
-  //     console.log("user deleted: " + res.data.id);
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     setOpen(false);
-  //   }
-  // };
-
   const handleGetLog = async () => {
     setPageLoading(true);
 
     try {
-      currentPeserta.id = selectedPeserta.id;
-      currentPeserta.name = selectedPeserta.name;
-      currentPeserta.nip = selectedPeserta.nip;
-      await getSubmissionList(1, 5, selectedPeserta.id);
-      console.log('getting log for user: ' + selectedPeserta.id);
-
-      navigate('/userlog');
+      navigate(`/userlog?id=${detailId}`);
     } catch (e) {
       console.error(e);
     } finally {
       setPageLoading(false);
     }
   };
-
-  // const handleHapusUser = async () => {
-  //   setPageLoading(true);
-
-  //   try {
-  //     await deleteUserById(selectedPeserta.id);
-  //     console.log("deleted user: " + selectedPeserta.id);
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     setPageLoading(false);
-  //   }
-  // };
 
   const handleStart = async () => {
     setPageLoading(true);
@@ -255,13 +226,6 @@ const Search = () => {
       );
     } finally {
       setPageLoading(false);
-      // setOpen(false);
-      // setNama('');
-      // setNip('');
-      // setEmail('');
-      // setCode('');
-      // setPosition('');
-      // setBirthDate(null);
     }
   };
 
@@ -430,11 +394,6 @@ const Search = () => {
                           variant="outlined"
                           onClick={() => {
                             setDetailId(row.id), setDetailOpen(true);
-                            setSelectedPeserta({
-                              id: row.id,
-                              name: row.name,
-                              nip: row.nip,
-                            });
                           }}
                         >
                           Detail
@@ -491,7 +450,7 @@ const Search = () => {
             variant="outlined"
             color="error"
             className="bg-white text-red-600 hover:bg-red-600 hover:text-white"
-            onClick={() => handleLogout()}
+            onClick={handleLogoutOpen}
           >
             Logout
           </Button>
@@ -539,34 +498,12 @@ const Search = () => {
             margin="normal"
             id="nip"
             label="NIP"
-            type="text"
+            type="number"
             fullWidth
             variant="standard"
             value={nip}
             onChange={(e) => setNip(e.target.value)}
           />
-          {/* <div className="flex gap-4">
-            <TextField
-              className="w-1/2"
-              margin="normal"
-              id="nip"
-              label="NIP"
-              type="text"
-              variant="standard"
-              value={nip}
-              onChange={(e) => setNip(e.target.value)}
-            />
-            <TextField
-              className="w-1/2"
-              margin="normal"
-              id="code"
-              label="Kode Kedinasan"
-              type="text"
-              variant="standard"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-          </div> */}
           <div className="flex gap-4 items-center">
             <TextField
               className="w-1/2"
@@ -599,7 +536,10 @@ const Search = () => {
       <TraineeDetail
         id={detailId}
         isOpen={detailOpen}
-        handleClose={() => setDetailOpen(false)}
+        handleClose={() => {
+          setDetailOpen(false);
+          setDetailId("");
+        }}
         handleLog={() => {
           setDetailOpen(false);
           handleGetLog();
@@ -619,10 +559,6 @@ const Search = () => {
           );
           setEditPrompt(true);
         }}
-        // handleHapus={() => {
-        //   setDetailOpen(false);
-        //   handleHapusUser();
-        // }}
       />
 
       {/* Edit Peserta Prompt */}
@@ -652,6 +588,7 @@ const Search = () => {
               className="my-4"
               id="new-nip"
               label="NIP"
+              type='number'
               name="new-nip"
               variant="standard"
               fullWidth
@@ -673,7 +610,6 @@ const Search = () => {
                 value={newBirthDate}
                 format="DD/MM/YYYY"
                 onChange={(date) => setNewBirthDate(date)}
-                // defaultValue={dayjs(detailPeserta.born)}
               />
             </div>
           </form>
@@ -700,6 +636,46 @@ const Search = () => {
       </Dialog>
 
       <FullPageLoading loading={pageLoading} />
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog
+          open={logoutOpen}
+          onClose={handleLogoutClose}
+          aria-labelledby="logout-dialog-title"
+          aria-describedby="logout-dialog-description"
+          className="p-6"
+        >
+          <DialogTitle id="logout-dialog-title">Konfirmasi Logout</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="logout-dialog-description">
+              Apakah Anda yakin ingin logout?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions className="flex p-6 justify-between w-full">
+            <Button 
+              onClick={handleLogoutClose}
+              color="primary"
+            >
+              Batal
+            </Button>
+            <Button 
+              onClick={handleConfirmLogout} color="error" variant="outlined"
+              sx={{
+                color: "#df2935",
+                borderColor: "#df2935",
+                backgroundColor: "#ffffff",
+                "&:hover": {
+                  borderColor: "#df2935",
+                  backgroundColor: "#df2935",
+                  color: "#ffffff",
+                },
+              }}
+              >
+                Logout
+            </Button>
+          </DialogActions>
+        </Dialog>
+
     </Container>
   );
 };

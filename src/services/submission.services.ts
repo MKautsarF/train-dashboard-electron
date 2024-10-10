@@ -32,6 +32,19 @@ export const deleteSubmissionById = async (id: number) => {
   return res.data;
 };
 
+export const deleteAllSubmissionById = async (id: string) => {
+  const res = await services.delete(`instructor/submission/user/${id}`);
+
+  return res.data;
+};
+
+// ADMIN
+export const deleteAllSubmissionByIdAsAdmin = async (id: string) => {
+  const res = await services.delete(`admin/submission/user/${id}`);
+
+  return res.data;
+};
+
 export const finishSubmissionById = async (id: number) => {
   const res = await services.put(`/instructor/submission/${id}/finish`);
 

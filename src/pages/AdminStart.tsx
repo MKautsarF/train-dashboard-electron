@@ -5,7 +5,14 @@ import {
   ManageAccounts,
   Groups,
 } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { 
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+ } from "@mui/material";
 import React, { useState } from 'react';
 import Logo from '@/components/Logo';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +25,13 @@ const AdminStart = () => {
 
   // const [username, setUsername] = useState("Kautsar");
 
-  const handleLogin = () => {
+  const [logoutOpen, setLogoutOpen] = useState(false);
+
+  const handleLogoutOpen = () => setLogoutOpen(true);
+  const handleLogoutClose = () => setLogoutOpen(false);
+
+  const handleConfirmLogout = () => {
+    logout();
     navigate('/');
   };
 
@@ -28,10 +41,6 @@ const AdminStart = () => {
 
   const handleInstruktur = () => {
     navigate('/instructorlist');
-  };
-
-  const handleLogout = () => {
-    logout();
   };
 
   return (
@@ -71,13 +80,61 @@ const AdminStart = () => {
             type="button"
             color="error"
             variant="outlined"
-            // startIcon={<NavigateBefore />}
-            onClick={() => handleLogout()}
+            onClick={handleLogoutOpen}
+            sx={{
+              color: "#df2935",
+              borderColor: "#df2935",
+              backgroundColor: "#ffffff",
+              "&:hover": {
+                borderColor: "#df2935",
+                backgroundColor: "#df2935",
+                color: "#ffffff",
+              },
+            }}
           >
             Logout
           </Button>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog
+          open={logoutOpen}
+          onClose={handleLogoutClose}
+          aria-labelledby="logout-dialog-title"
+          aria-describedby="logout-dialog-description"
+          className="p-6"
+        >
+          <DialogTitle id="logout-dialog-title">Konfirmasi Logout</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="logout-dialog-description">
+              Apakah Anda yakin ingin logout?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions className="flex p-6 justify-between w-full">
+            <Button 
+              onClick={handleLogoutClose}
+              color="primary"
+            >
+              Batal
+            </Button>
+            <Button 
+              onClick={handleConfirmLogout} color="error" variant="outlined"
+              sx={{
+                color: "#df2935",
+                borderColor: "#df2935",
+                backgroundColor: "#ffffff",
+                "&:hover": {
+                  borderColor: "#df2935",
+                  backgroundColor: "#df2935",
+                  color: "#ffffff",
+                },
+              }}
+              >
+                Logout
+            </Button>
+          </DialogActions>
+        </Dialog>
     </Container>
   );
 };
