@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
-import bptp from '@/static/BPTP.png';
-import mot from '@/static/MoT.png';
-import { Title } from '@mui/icons-material';
+import bptp from "@/static/BPTP.png";
+import mot from "@/static/MoT.png";
+import { Title } from "@mui/icons-material";
 
 const Logo = () => {
   return (
@@ -16,7 +16,7 @@ const Logo = () => {
         <span>M</span>
         <span>S</span>
       </h1>
-      <p className="text-slate-400">&nbsp;by pinteraktif</p>
+      {/* <p className="text-slate-400">&nbsp;by pinteraktif</p> */}
     </div>
   );
 };
