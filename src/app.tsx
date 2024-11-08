@@ -27,7 +27,8 @@ import ScoringMRT from './pages/ScoringMRT';
 import ScoringKRL from './pages/ScoringKRL';
 import FormO100 from './pages/FormO100';
 import FormO82 from './pages/FormO82';
-
+import FormO100MRT from './pages/FormO100MRT';
+import FormO100MRT1 from './pages/FormO100MRT1';
 import TEST from './pages/testingpdf';
 
 const routerData = [
@@ -94,6 +95,14 @@ const routerData = [
   {
     path: '/form/o82',
     element: <FormO82 />,
+  },
+  {
+    path: '/form/o100mrt',
+    element: <FormO100MRT />,
+  },
+  {
+    path: '/form/o100mrt1',
+    element: <FormO100MRT1 />,
   },
 ];
 

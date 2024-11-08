@@ -23,20 +23,37 @@ import fs from 'fs';
 
 const FormO82 = () => {
   const navigate = useNavigate();
+  const filepath = 'C:/Train Simulator/Data/Tabel_0_82.json';
+  const json = fs.readFileSync(filepath, 'utf-8');
+  const data = JSON.parse(json);
 
   const { settings } = useSettings();
 
   const [rangkaian] = useState(settings.kereta);
   const [tonage] = useState(settings.berat);
-  const [taspat, setTaspat] = useState<string>('');
-  const filepath = 'C:/Train Simulator/Data/Tabel_0_100.json';
-  const json = fs.readFileSync(filepath, 'utf-8');
+  const [taspat, setTaspat] = useState(data[0].taspat);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTaspat(e.target.value);
   };
 
-  const handleSave = () => {};
+  const handleSave = () => {
+    try {
+      const payload = [{ taspat }];
+
+      fs.writeFileSync(
+        filepath,
+        JSON.stringify([{ taspat }], null, 2)
+      );
+
+      console.log(payload);
+      navigate(-1);
+    } catch (e) {
+      console.error(e);
+      console.log("Unable to save to json");
+    }
+  };
   const pdfgenerate = () => {
     try {
       handleSave();

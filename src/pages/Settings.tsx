@@ -673,6 +673,96 @@ const Settings = () => {
               ) : (
                 <></>
               )}
+
+              {trainType === 'mrt' ? (
+                <>
+                  <Button
+                    id="basic-button"
+                    aria-controls={open ? 'basic-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                    variant="outlined"
+                    startIcon={<Description />}
+                    endIcon={<ArrowDropDown />}
+                    color="success"
+                  >
+                    Dokumen KA
+                  </Button>
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                      'aria-labelledby': 'basic-button',
+                    }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        shell.openPath('C:/Train Simulator/Data/Berita Acara Human Error.pdf');
+                        // handleClose();
+                      }}
+                    >
+                      Berita Acara
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        shell.openPath('C:/Train Simulator/Data/IBD.pdf');
+                        // handleClose();
+                      }}
+                    >
+                      Inspection Form
+                    </MenuItem>
+                    
+                    <MenuItem
+                      onClick={() => {
+                        if (settings.stasiunAsal === 'Stasiun Bundaran HI') {
+                          navigate('/form/o100mrt1');  // Navigate to o100 edit page
+                        } else {
+                          navigate('/form/o100mrt');  // Fallback edit navigation
+                        }
+                      }}
+                      //   navigate('/form/o100mrt');
+                      // }}
+                      className="flex justify-between gap-16"
+                    >
+                      <span>O.100</span>
+                      <Chip
+                        label="Edit"
+                        size="small"
+                        onClick={() => {
+                          if (settings.stasiunAsal === 'Stasiun Bundaran HI') {
+                            navigate('/form/o100mrt1');  // Navigate to o100 edit page
+                          } else {
+                            navigate('/form/o100mrt');  // Fallback edit navigation
+                          }
+                        }}
+                        //   navigate('/form/o100mrt');
+                        // }}
+                      />
+                    </MenuItem>
+
+                    {/* <MenuItem
+                      onClick={() => {
+                        navigate('/form/o100mrt1');
+                      }}
+                      className="flex justify-between gap-16"
+                    >
+                      <span>O.100 (BHI)</span>
+                      <Chip
+                        label="Edit"
+                        size="small"
+                        onClick={() => {
+                          navigate('/form/o100mrt1');
+                        }}
+                      />
+                    </MenuItem> */}
+                  </Menu>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           }
 
